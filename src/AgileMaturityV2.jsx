@@ -398,6 +398,8 @@ export default function AgileMaturityV2() {
   const [showResults, setShowResults] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [fadeIn, setFadeIn] = useState(true);
+  const [email, setEmail] = useState("");
+  const [emailUnlocked, setEmailUnlocked] = useState(false);
   const topRef = useRef(null);
 
   useEffect(() => {
@@ -441,7 +443,7 @@ export default function AgileMaturityV2() {
   const strengths = sorted.slice(0, 2);
   const weaknesses = sorted.slice(-2).reverse();
 
-  const reset = () => { setAnswers({}); setCurrentQ(0); setShowResults(false); setSelectedOption(null); setFadeIn(true); setStarted(false); };
+  const reset = () => { setAnswers({}); setCurrentQ(0); setShowResults(false); setSelectedOption(null); setFadeIn(true); setStarted(false); setEmail(""); setEmailUnlocked(false); };
 
   const cs = { minHeight: "100vh", background: "#0f172a", padding: "24px 16px", fontFamily: "'DM Sans', sans-serif" };
   const card = { background: "rgba(30,41,59,0.8)", backdropFilter: "blur(12px)", borderRadius: "16px", border: "1px solid rgba(148,163,184,0.1)", padding: "24px", marginBottom: "20px" };
@@ -482,6 +484,39 @@ export default function AgileMaturityV2() {
           </div>
         </div>
 
+        {!emailUnlocked ? (
+          <div style={{ ...card, textAlign: "center", background: "linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.9))", border: "1px solid rgba(59,130,246,0.3)" }}>
+            <span style={{ ...label, color: "#3b82f6" }}>Detailed Insights & Recommendations</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "24px" }}>
+              {categoryScores.map((c) => {
+                const pct = Math.round((c.score / c.max) * 100);
+                return (
+                  <div key={c.category} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "rgba(15,23,42,0.5)", borderRadius: "8px", filter: "blur(0px)" }}>
+                    <span style={{ color: "#64748b", fontSize: "13px" }}>{c.icon} {c.category}</span>
+                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "12px", color: "#475569" }}>● ● ● ● ●</span>
+                  </div>
+                );
+              })}
+            </div>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: "20px", fontWeight: 800, color: "#f8fafc", margin: "0 0 8px 0" }}>Unlock your full team report</h3>
+            <p style={{ color: "#94a3b8", fontSize: "14px", lineHeight: 1.6, margin: "0 0 24px 0" }}>Get specific action steps for each dimension, personalized to your team's scores.</p>
+            <div style={{ display: "flex", gap: "8px", maxWidth: "400px", margin: "0 auto" }}>
+              <input
+                type="email"
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && email.includes("@")) setEmailUnlocked(true); }}
+                style={{ flex: 1, padding: "14px 16px", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(148,163,184,0.2)", borderRadius: "10px", color: "#f8fafc", fontSize: "14px", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
+              />
+              <button
+                onClick={() => { if (email.includes("@")) setEmailUnlocked(true); }}
+                style={{ padding: "14px 24px", background: email.includes("@") ? "#3b82f6" : "#1e293b", color: email.includes("@") ? "#fff" : "#475569", border: "none", borderRadius: "10px", fontSize: "14px", fontWeight: 600, fontFamily: "'DM Sans', sans-serif", cursor: email.includes("@") ? "pointer" : "default", transition: "all 0.2s ease" }}
+              >Unlock</button>
+            </div>
+            <p style={{ color: "#475569", fontSize: "11px", marginTop: "12px" }}>No spam. We use this to send you the full report.</p>
+          </div>
+        ) : (
         <div style={card}>
           <span style={{ ...label, color: "#64748b" }}>Detailed Insights & Recommendations</span>
           {categoryScores.map((c) => {
@@ -501,12 +536,13 @@ export default function AgileMaturityV2() {
                 <div style={{ background: "rgba(15,23,42,0.5)", borderRadius: "10px", padding: "14px", borderLeft: "3px solid #3b82f6" }}>
                   <div style={{ color: "#93c5fd", fontSize: "11px", fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "6px" }}>Action Step</div>
                   <p style={{ color: "#e2e8f0", fontSize: "13px", lineHeight: 1.6, margin: "0 0 8px 0" }}>{ins[lv + "Action"]}</p>
-                  <p style={{ color: "#64748b", fontSize: "12px", margin: 0, fontStyle: "italic" }}>This is where <strong style={{ color: "#93c5fd" }}>{en}</strong> specializes — {er}. <a href="https://hillgliga.com" target="_blank" rel="noopener noreferrer" style={{ color: "#3b82f6", textDecoration: "underline" }}>Book a conversation →</a></p>
+                  <p style={{ color: "#64748b", fontSize: "12px", margin: 0, fontStyle: "italic" }}>This is where <strong style={{ color: "#93c5fd" }}>{en}</strong> specializes — {er}.</p>
                 </div>
               </div>
             );
           })}
         </div>
+        )}
 
         <div style={{ ...card, textAlign: "center", background: "linear-gradient(135deg, rgba(59,130,246,0.15), rgba(99,102,241,0.15))", border: "1px solid rgba(59,130,246,0.3)" }}>
           <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: "20px", fontWeight: 800, color: "#f8fafc", margin: "0 0 8px 0" }}>Want to accelerate your team's maturity?</h3>

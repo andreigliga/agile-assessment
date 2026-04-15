@@ -484,22 +484,38 @@ export default function AgileMaturityV2() {
           </div>
         </div>
 
-        {!emailUnlocked ? (
-          <div style={{ ...card, textAlign: "center", background: "linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.9))", border: "1px solid rgba(59,130,246,0.3)" }}>
-            <span style={{ ...label, color: "#3b82f6" }}>Detailed Insights & Recommendations</span>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "24px" }}>
-              {categoryScores.map((c) => {
-                const pct = Math.round((c.score / c.max) * 100);
-                return (
-                  <div key={c.category} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "rgba(15,23,42,0.5)", borderRadius: "8px", filter: "blur(0px)" }}>
-                    <span style={{ color: "#64748b", fontSize: "13px" }}>{c.icon} {c.category}</span>
-                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "12px", color: "#475569" }}>● ● ● ● ●</span>
+        <div style={card}>
+          <span style={{ ...label, color: "#64748b" }}>Detailed Insights</span>
+          {categoryScores.map((c) => {
+            const pct = Math.round((c.score / c.max) * 100);
+            const lv = pct >= 75 ? "high" : pct >= 50 ? "mid" : "low";
+            const ins = categoryInsights[c.category];
+            const exp = categoryExperts[c.category];
+            const en = exp === "andrei" ? "Andrei Gliga" : exp === "tom" ? "Tom Hill" : "Andrei Gliga & Tom Hill";
+            const er = exp === "andrei" ? "team dynamics, facilitation, and coaching" : exp === "tom" ? "engineering practices and technical leadership" : "delivery strategy and organizational alignment";
+            return (
+              <div key={c.category} style={{ marginBottom: "24px", paddingBottom: "24px", borderBottom: "1px solid rgba(148,163,184,0.1)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                  <span style={{ color: "#e2e8f0", fontSize: "15px", fontWeight: 700 }}>{c.icon} {c.category}</span>
+                  <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "12px", fontWeight: 600, color: pct >= 75 ? "#34d399" : pct >= 50 ? "#fbbf24" : "#f87171", background: pct >= 75 ? "rgba(52,211,153,0.1)" : pct >= 50 ? "rgba(251,191,36,0.1)" : "rgba(248,113,113,0.1)", padding: "2px 10px", borderRadius: "12px" }}>{pct}%</span>
+                </div>
+                <p style={{ color: "#cbd5e1", fontSize: "13px", lineHeight: 1.7, margin: 0 }}>{ins[lv]}</p>
+                {emailUnlocked && (
+                  <div style={{ background: "rgba(15,23,42,0.5)", borderRadius: "10px", padding: "14px", borderLeft: "3px solid #3b82f6", marginTop: "12px" }}>
+                    <div style={{ color: "#93c5fd", fontSize: "11px", fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "6px" }}>Action Step</div>
+                    <p style={{ color: "#e2e8f0", fontSize: "13px", lineHeight: 1.6, margin: "0 0 8px 0" }}>{ins[lv + "Action"]}</p>
+                    <p style={{ color: "#64748b", fontSize: "12px", margin: 0, fontStyle: "italic" }}>This is where <strong style={{ color: "#93c5fd" }}>{en}</strong> specializes in {er}.</p>
                   </div>
-                );
-              })}
-            </div>
-            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: "20px", fontWeight: 800, color: "#f8fafc", margin: "0 0 8px 0" }}>Unlock your full team report</h3>
-            <p style={{ color: "#94a3b8", fontSize: "14px", lineHeight: 1.6, margin: "0 0 24px 0" }}>Get specific action steps for each dimension, personalized to your team's scores.</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {!emailUnlocked && (
+          <div style={{ ...card, textAlign: "center", background: "linear-gradient(135deg, rgba(59,130,246,0.08), rgba(99,102,241,0.08))", border: "1px solid rgba(59,130,246,0.2)" }}>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: "20px", fontWeight: 800, color: "#f8fafc", margin: "0 0 8px 0" }}>Get your action plan</h3>
+            <p style={{ color: "#94a3b8", fontSize: "14px", lineHeight: 1.6, margin: "0 0 24px 0" }}>Unlock specific action steps for each dimension, tailored to your scores.</p>
             <div style={{ display: "flex", gap: "8px", maxWidth: "400px", margin: "0 auto" }}>
               <input
                 type="email"
@@ -514,34 +530,8 @@ export default function AgileMaturityV2() {
                 style={{ padding: "14px 24px", background: email.includes("@") ? "#3b82f6" : "#1e293b", color: email.includes("@") ? "#fff" : "#475569", border: "none", borderRadius: "10px", fontSize: "14px", fontWeight: 600, fontFamily: "'DM Sans', sans-serif", cursor: email.includes("@") ? "pointer" : "default", transition: "all 0.2s ease" }}
               >Unlock</button>
             </div>
-            <p style={{ color: "#475569", fontSize: "11px", marginTop: "12px" }}>No spam. We use this to send you the full report.</p>
+            <p style={{ color: "#475569", fontSize: "11px", marginTop: "12px" }}>No spam. Just your personalized action steps.</p>
           </div>
-        ) : (
-        <div style={card}>
-          <span style={{ ...label, color: "#64748b" }}>Detailed Insights & Recommendations</span>
-          {categoryScores.map((c) => {
-            const pct = Math.round((c.score / c.max) * 100);
-            const lv = pct >= 75 ? "high" : pct >= 50 ? "mid" : "low";
-            const ins = categoryInsights[c.category];
-            const exp = categoryExperts[c.category];
-            const en = exp === "andrei" ? "Andrei Gliga" : exp === "tom" ? "Tom Hill" : "Andrei Gliga & Tom Hill";
-            const er = exp === "andrei" ? "team dynamics, facilitation, and coaching" : exp === "tom" ? "engineering practices and technical leadership" : "delivery strategy and organizational alignment";
-            return (
-              <div key={c.category} style={{ marginBottom: "24px", paddingBottom: "24px", borderBottom: "1px solid rgba(148,163,184,0.1)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                  <span style={{ color: "#e2e8f0", fontSize: "15px", fontWeight: 700 }}>{c.icon} {c.category}</span>
-                  <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "12px", fontWeight: 600, color: pct >= 75 ? "#34d399" : pct >= 50 ? "#fbbf24" : "#f87171", background: pct >= 75 ? "rgba(52,211,153,0.1)" : pct >= 50 ? "rgba(251,191,36,0.1)" : "rgba(248,113,113,0.1)", padding: "2px 10px", borderRadius: "12px" }}>{pct}%</span>
-                </div>
-                <p style={{ color: "#cbd5e1", fontSize: "13px", lineHeight: 1.7, margin: "0 0 12px 0" }}>{ins[lv]}</p>
-                <div style={{ background: "rgba(15,23,42,0.5)", borderRadius: "10px", padding: "14px", borderLeft: "3px solid #3b82f6" }}>
-                  <div style={{ color: "#93c5fd", fontSize: "11px", fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "6px" }}>Action Step</div>
-                  <p style={{ color: "#e2e8f0", fontSize: "13px", lineHeight: 1.6, margin: "0 0 8px 0" }}>{ins[lv + "Action"]}</p>
-                  <p style={{ color: "#64748b", fontSize: "12px", margin: 0, fontStyle: "italic" }}>This is where <strong style={{ color: "#93c5fd" }}>{en}</strong> specializes in {er}.</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
         )}
 
         <div style={{ ...card, textAlign: "center", background: "linear-gradient(135deg, rgba(59,130,246,0.15), rgba(99,102,241,0.15))", border: "1px solid rgba(59,130,246,0.3)" }}>

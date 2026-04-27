@@ -400,6 +400,7 @@ export default function AgileMaturityV2() {
   const [fadeIn, setFadeIn] = useState(true);
   const [email, setEmail] = useState("");
   const [emailUnlocked, setEmailUnlocked] = useState(false);
+  const [emailSending, setEmailSending] = useState(false);
   const topRef = useRef(null);
 
   useEffect(() => {
@@ -443,7 +444,33 @@ export default function AgileMaturityV2() {
   const strengths = sorted.slice(0, 2);
   const weaknesses = sorted.slice(-2).reverse();
 
-  const reset = () => { setAnswers({}); setCurrentQ(0); setShowResults(false); setSelectedOption(null); setFadeIn(true); setStarted(false); setEmail(""); setEmailUnlocked(false); };
+  const reset = () => { setAnswers({}); setCurrentQ(0); setShowResults(false); setSelectedOption(null); setFadeIn(true); setStarted(false); setEmail(""); setEmailUnlocked(false); setEmailSending(false); };
+
+  const sendResults = async () => {
+    if (!email.includes("@") || emailSending) return;
+    setEmailSending(true);
+    setEmailUnlocked(true);
+    try {
+      const scores = categoryScores.map(c => ({
+        category: c.category,
+        icon: c.icon,
+        pct: Math.round((c.score / c.max) * 100)
+      }));
+      await fetch("/api/send-results", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          scores,
+          overallPct: percentage,
+          verdict: verdict.level + " - " + verdict.message
+        })
+      });
+    } catch (e) {
+      console.error("Failed to send email:", e);
+    }
+    setEmailSending(false);
+  };
 
   const cs = { minHeight: "100vh", background: "#0f172a", padding: "24px 16px", fontFamily: "'DM Sans', sans-serif" };
   const card = { background: "rgba(30,41,59,0.8)", backdropFilter: "blur(12px)", borderRadius: "16px", border: "1px solid rgba(148,163,184,0.1)", padding: "24px", marginBottom: "20px" };
@@ -522,13 +549,13 @@ export default function AgileMaturityV2() {
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter" && email.includes("@")) setEmailUnlocked(true); }}
+                onKeyDown={(e) => { if (e.key === "Enter") sendResults(); }}
                 style={{ flex: 1, padding: "14px 16px", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(148,163,184,0.2)", borderRadius: "10px", color: "#f8fafc", fontSize: "14px", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
               />
               <button
-                onClick={() => { if (email.includes("@")) setEmailUnlocked(true); }}
+                onClick={sendResults}
                 style={{ padding: "14px 24px", background: email.includes("@") ? "#3b82f6" : "#1e293b", color: email.includes("@") ? "#fff" : "#475569", border: "none", borderRadius: "10px", fontSize: "14px", fontWeight: 600, fontFamily: "'DM Sans', sans-serif", cursor: email.includes("@") ? "pointer" : "default", transition: "all 0.2s ease" }}
-              >Unlock</button>
+              >{emailSending ? "Sending..." : "Unlock"}</button>
             </div>
             <p style={{ color: "#475569", fontSize: "11px", marginTop: "12px" }}>No spam. Just your personalized action steps.</p>
           </div>
